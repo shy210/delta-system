@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\BranchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostalCodeController;
@@ -33,8 +34,41 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     Route::put('/sucursales/{branch}', [BranchController::class, 'update'])
         ->name('branches.update');
+
+    Route::delete('/sucursales/{branch}', [BranchController::class, 'destroy'])
+        ->name('branches.destroy');
 });
 
+/*
+|--------------------------------------------------------------------------
+| Clientes
+|--------------------------------------------------------------------------
+*/
+
+// Clientes - Administrador y Empleado
+Route::middleware(['auth', 'role:admin,employee'])->group(function () {
+
+    Route::get('/clientes', [CustomerController::class, 'index'])
+        ->name('customers.index');
+
+    Route::get('/clientes/agregar', [CustomerController::class, 'create'])
+        ->name('customers.create');
+
+    Route::post('/clientes', [CustomerController::class, 'store'])
+        ->name('customers.store');
+
+    Route::get('/clientes/{customer}', [CustomerController::class, 'show'])
+        ->name('customers.show');
+
+    Route::get('/clientes/{customer}/editar', [CustomerController::class, 'edit'])
+        ->name('customers.edit');
+
+    Route::put('/clientes/{customer}', [CustomerController::class, 'update'])
+        ->name('customers.update');
+
+    Route::delete('/clientes/{customer}', [CustomerController::class, 'destroy'])
+        ->name('customers.destroy');
+});
 
 // Ver sucursales - Administrador y Empleado
 Route::middleware(['auth', 'role:admin,employee'])->group(function () {
