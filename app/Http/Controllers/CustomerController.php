@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use App\Exports\CustomersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CustomerController extends Controller
 {
@@ -165,4 +168,57 @@ class CustomerController extends Controller
             ->route('customers.index')
             ->with('success', 'El cliente se eliminó correctamente.');
     }
+
+    public function exportExcel(Request $request)
+    {
+        $search = trim((string) $request->input('search', ''));
+
+        return Excel::download(
+            new CustomersExport($search),
+            'clientes.xlsx'
+        );
+    }
+
+    public function exportPdf(Request $request)
+{
+    $search = trim((string) $request->input('search', ''));
+
+    $query = Customer::query();
+
+    if ($search !== '') {
+        $search = mb_strtolower($search);
+
+        $query->where(function ($q) use ($search) {
+            $q->whereRaw(
+                "LOWER(CONCAT_WS(' ', nombre, apellido_paterno, apellido_materno)) LIKE ?",
+                ["%{$search}%"]
+            )
+            ->orWhereRaw(
+                'LOWER(telefono) LIKE ?',
+                ["%{$search}%"]
+            )
+            ->orWhereRaw(
+                'LOWER(whatsapp) LIKE ?',
+                ["%{$search}%"]
+            )
+            ->orWhereRaw(
+                'LOWER(correo) LIKE ?',
+                ["%{$search}%"]
+            );
+        });
+    }
+
+    $customers = $query
+        ->latest()
+        ->get();
+
+    $pdf = Pdf::loadView(
+        'admin.clientes.pdf',
+        compact('customers', 'search')
+    );
+
+    $pdf->setPaper('a4', 'portrait');
+
+    return $pdf->download('clientes.pdf');
+}
 }
