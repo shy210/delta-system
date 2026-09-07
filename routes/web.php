@@ -5,7 +5,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\PostalCodeController;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ServiceOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +150,29 @@ Route::middleware('auth')->get(
     [PostalCodeController::class, 'search']
 )->name('postal-code.search');
 
+Route::middleware(['auth', 'role:admin,employee'])->group(function () {
+
+    Route::get('/mi-taller/ordenes', [ServiceOrderController::class, 'index'])
+        ->name('service-orders.index');
+
+    Route::get('/mi-taller/ordenes/crear', [ServiceOrderController::class, 'create'])
+        ->name('service-orders.create');
+
+    Route::post('/mi-taller/ordenes', [ServiceOrderController::class, 'store'])
+        ->name('service-orders.store');
+
+    Route::get('/mi-taller/ordenes/{serviceOrder}', [ServiceOrderController::class, 'show'])
+        ->name('service-orders.show');
+
+    Route::get('/mi-taller/ordenes/{serviceOrder}/editar', [ServiceOrderController::class, 'edit'])
+        ->name('service-orders.edit');
+
+    Route::put('/mi-taller/ordenes/{serviceOrder}', [ServiceOrderController::class, 'update'])
+        ->name('service-orders.update');
+
+    Route::delete('/mi-taller/ordenes/{serviceOrder}', [ServiceOrderController::class, 'destroy'])
+        ->name('service-orders.destroy');
+});
 
 /*
 |--------------------------------------------------------------------------
