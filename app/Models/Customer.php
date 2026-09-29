@@ -40,13 +40,27 @@ class Customer extends Model
         ];
     }
 
+    /**
+     * Usuario relacionado con el cliente.
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Órdenes de servicio del cliente.
+     */
     public function serviceOrders(): HasMany
-{
-    return $this->hasMany(ServiceOrder::class);
-}
+    {
+        return $this->hasMany(ServiceOrder::class);
+    }
+
+    /**
+     * Solicitudes de crédito del cliente.
+     */
+    public function creditApplications(): HasMany
+    {
+        return $this->hasMany(CreditApplication::class);
+    }
 }
